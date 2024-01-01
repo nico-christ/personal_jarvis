@@ -22,20 +22,20 @@ This project utilizes the SpeechRecognition library in Python for speech recogni
 1. **Clone the repository:**
 
    ```bash
-   `git clone https://https://github.com/nico-christ/personal_jarvis.git`
-   `cd personal_jarvis`
+   git clone https://https://github.com/nico-christ/personal_jarvis.git
+   cd personal_jarvis
 
 2. **Install dependencies:**
     ```bash
-    `pip install -r requirements.txt`
+    pip install -r requirements.txt
 
 ## Usage
 
 1. Run the main.py script to test speech recognition.
     ```bash
-    `python main.py`
+    python main.py
 
-    This will recognize speech using the default Google recognition engine.
+This will recognize speech using the default Google recognition engine.
 
 2. Customize the recognition engine or parameters in the main.py script according to your requirements.
 
