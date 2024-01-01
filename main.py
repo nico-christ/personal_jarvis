@@ -1,10 +1,7 @@
-import * from voice_reg as vc
-    """
-    main script to execute the program
-    """
+from text_to_speech import call_text_to_speech as speak
 
 def main():
-    vc.main()
+    speak("Hallo Alfred", "de")
 
 
 if __name__ == "__main__":
