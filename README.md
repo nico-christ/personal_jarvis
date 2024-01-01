@@ -1,6 +1,11 @@
 # personal_jarvis
 Personal_Jarvis
 
+**!!! The voice_reg_experimental does not work !!!**
+Please use the voice_reg instead.
+Working on it.
+
+
 ## Speech Recognition Project
 
 This project utilizes the SpeechRecognition library in Python for speech recognition on audio files. It includes functionality to record audio, recognize speech using different engines, and provides a modular structure for easy customization.
