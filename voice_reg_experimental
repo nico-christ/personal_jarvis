@@ -9,7 +9,7 @@ AXIS = 1              # Axis for FFT calculation
 COEFFICIENT = 0.97    # Preemphasis coefficient
 FRAME_SIZE = 0.025    # Size of each frame in seconds
 FRAME_STRIDE = 0.01   # Stride between frames in seconds
-FILE_PATH = 'C:\Coding\Git\Jarvis\personal_jarvis\\files\harvard.wav'  # Path to the audio file (for testing purposes only)
+FILE_PATH = 'files\harvard.wav'  # Path to the audio file (for testing purposes only)
 
 def read_wav(file_path):
     # Read WAV file and return the sampling rate and data
