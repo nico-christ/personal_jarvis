@@ -1,0 +1,71 @@
+import numpy as np
+import scipy.io.wavfile as wav
+from scipy.fftpack import fft
+from scipy.signal import hamming
+
+
+# Constants
+AXIS = 1              # Axis for FFT calculation
+COEFFICIENT = 0.97    # Preemphasis coefficient
+FRAME_SIZE = 0.025    # Size of each frame in seconds
+FRAME_STRIDE = 0.01   # Stride between frames in seconds
+FILE_PATH = 'C:\Coding\Git\Jarvis\personal_jarvis\\files\harvard.wav'  # Path to the audio file (for testing purposes only)
+
+def read_wav(file_path):
+    # Read WAV file and return the sampling rate and data
+    rate, data = wav.read(file_path)
+    return rate, data
+
+def preemphasis(signal, coefficient=COEFFICIENT):
+    # Apply preemphasis to the audio signal
+    return np.append(signal[0], signal[1:] - coefficient * signal[:-1])
+
+def frame_signal(signal, frame_size, frame_stride, rate):
+    # Frame the signal into overlapping windows
+    frame_length, frame_step = frame_size * rate, frame_stride * rate
+    signal_length = len(signal)
+    num_frames = int(np.ceil(float(np.abs(signal_length - frame_length)) / frame_step))
+
+    # Pad the signal to ensure all frames are processed
+    padsignal_length = num_frames * frame_step + frame_length
+    padsignal = np.pad(signal, (0, padsignal_length - signal_length), 'constant', constant_values=(0, 0))
+
+    # Create indices for framing the signal
+    indices = np.tile(np.arange(0, frame_length), (num_frames, 1)) + np.tile(
+        np.arange(0, num_frames * frame_step, frame_step), (frame_length, 1)).T
+    frames = padsignal[indices.astype(np.int32, copy=False)]
+
+    return frames
+
+def apply_hamming(frames):
+    # Apply Hamming window to each frame
+    frames *= hamming(frames.shape[1])
+    return frames
+
+def calculate_magnitude_spectrum(frames):
+    # Calculate the magnitude spectrum using Fast Fourier Transform (FFT)
+    return np.abs(fft(frames, axis=AXIS))
+
+def main():
+    file_path = FILE_PATH
+
+    # Step 1: Read the WAV file
+    rate, data = read_wav(file_path)
+
+    # Step 2: Apply preemphasis to the audio signal
+    data = preemphasis(data)
+
+    # Step 3: Frame the signal into overlapping windows
+    frames = frame_signal(data, frame_size=FRAME_SIZE, frame_stride=FRAME_STRIDE, rate=rate)
+
+    # Step 4: Apply Hamming window to each frame
+    frames = apply_hamming(frames)
+
+    # Step 5: Calculate the magnitude spectrum using FFT
+    magnitude_spectrum = calculate_magnitude_spectrum(frames)
+
+    # At this point, more advanced signal processing,
+    # feature extraction, and pattern recognition techniques are needed for speech identification.
+
+if __name__ == "__main__":
+    main()
