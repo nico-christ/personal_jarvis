@@ -1,15 +1,15 @@
-from gtts import gTTS
 import os
 import time
 import subprocess
 import logging
+from gtts import gTTS
 
 # Constants
 FILE_PATH = 'out/output.mp3'
 LANGUAGE = 'en'
 TEST_TEXT = 'Hello, this is a text-to-speech example.'
 
-def text_to_speech(text, language, file_path):
+def text_to_speech(text, language=LANGUAGE, file_path=FILE_PATH):
     """
     Convert text to speech and play the generated speech.
 
@@ -22,16 +22,14 @@ def text_to_speech(text, language, file_path):
         # Create a gTTS object
         tts = gTTS(text=text, lang=language, slow=False)
 
+        # Save the generated speech to a file
         try:
-            # Save the generated speech to a file
             tts.save(file_path)
-            
         except Exception as e:
-            logging.error(f"Error: File couldn´t be created. - {e}")
+            logging.error(f"Error: File couldn't be created - {e}")
 
         # Play the generated speech using subprocess
         subprocess.run(['start', file_path], shell=True)
-
         logging.info("Speech successfully generated and played.")
 
     except Exception as e:
@@ -62,7 +60,7 @@ def call_text_to_speech(text=TEST_TEXT, language=LANGUAGE):
     # Sleep 10s to prevent early deletion
     time.sleep(10)
     
-    # Delete the tmp mp3 file
+    # Delete the temporary mp3 file
     del_file()
 
 def main():

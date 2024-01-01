@@ -2,8 +2,8 @@ import speech_recognition as sr
 
 # Constants
 FILE_PATH = 'files/jackhammer.wav'  # Path to the audio file
-AMBIENT_NOISE_DURATION = 0.1
-SHOW_FULL_RESPONSE = True # Determine the API respone of the regognition software. TRUE = full respone, FALSE = only most likely answer
+AMBIENT_NOISE_DURATION = 0.1 # Determine the duration of the noice filtering. Adjust for diffrent quality.
+SHOW_FULL_RESPONSE = True  # Determine the API response of the recognition software. TRUE = full response, FALSE = only most likely answer
 
 
 def record_audio(file_path):
@@ -25,6 +25,7 @@ def record_audio(file_path):
 
     return audio_data
 
+
 def recognize_audio(audio_data):
     """
     Recognizes speech from the given audio data using Google's speech recognition.
@@ -39,12 +40,12 @@ def recognize_audio(audio_data):
 
     try:
         recognized_text = recognizer.recognize_google(audio_data, show_all=SHOW_FULL_RESPONSE)
-                         #recognizer.recognize_google(source[string], offset[float], duration[float])
-        return recognized_text
     except sr.UnknownValueError:
         return "Google Speech Recognition could not understand audio"
     except sr.RequestError as e:
         return f"Could not request results from Google Speech Recognition service; {e}"
+
+    return recognized_text
 
 
 def main():
