@@ -1,7 +1,7 @@
 # personal_jarvis
 Personal_Jarvis
 
-# Speech Recognition Project
+## Speech Recognition Project
 
 This project utilizes the SpeechRecognition library in Python for speech recognition on audio files. It includes functionality to record audio, recognize speech using different engines, and provides a modular structure for easy customization.
 
@@ -17,8 +17,8 @@ This project utilizes the SpeechRecognition library in Python for speech recogni
 1. **Clone the repository:**
 
    ```bash
-   `git clone https://github.com/yourusername/speech-recognition-project.git`
-   `cd speech-recognition-project`
+   `git clone https://https://github.com/nico-christ/personal_jarvis.git`
+   `cd personal_jarvis`
 
 2. **Install dependencies:**
     ```bash
