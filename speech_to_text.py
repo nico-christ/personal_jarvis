@@ -1,7 +1,7 @@
 import speech_recognition as sr
 
 # Constants
-FILE_PATH = 'files/jackhammer.wav'  # Path to the audio file
+FILE_PATH = 'files/harvard.wav'  # Path to the audio file
 AMBIENT_NOISE_DURATION = 0.1 # Determine the duration of the noice filtering. Adjust for diffrent quality.
 SHOW_FULL_RESPONSE = True  # Determine the API response of the recognition software. TRUE = full response, FALSE = only most likely answer
 
@@ -47,6 +47,8 @@ def recognize_audio(audio_data):
 
     return recognized_text
 
+def call_speech_to_text():
+    main()
 
 def main():
     """
