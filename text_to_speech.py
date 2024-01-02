@@ -73,7 +73,7 @@ languages = {
 
 # Constants
 FILE_PATH = 'out/output.mp3'
-LANGUAGE = languages["German"]
+LANGUAGE = languages["English"]
 TEST_TEXT = 'Hello, this is a text-to-speech example.'
 
 
