@@ -2,7 +2,7 @@ import speech_recognition as sr
 
 # Constants
 FILE_PATH = 'files/harvard.wav'  # Path to the audio file
-AMBIENT_NOISE_DURATION = 0.1 # Determine the duration of the noice filtering. Adjust for diffrent quality.
+AMBIENT_NOISE_DURATION = 1 # Determine the duration of the noice filtering. Adjust for diffrent quality.
 SHOW_FULL_RESPONSE = False  # Determine the API response of the recognition software. TRUE = full response, FALSE = only most likely answer
 
 
@@ -38,7 +38,8 @@ def recognize_audio():
     r = sr.Recognizer()
 
     with sr.Microphone() as source:
-        #//TODO Add some ambient noise adjustment
+        print("Adjusting noise")
+        r.adjust_for_ambient_noise(source, AMBIENT_NOISE_DURATION)
         # Actual 
         print("Say something:")
         audio = r.listen(source)
