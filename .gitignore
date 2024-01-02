@@ -36,3 +36,5 @@ obj/
 [Dd]ebug*/
 [Rr]elease*/
 Ankh.NoLoad
+__pychache__/
+.venv/

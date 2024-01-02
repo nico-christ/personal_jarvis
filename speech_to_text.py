@@ -6,7 +6,7 @@ AMBIENT_NOISE_DURATION = 0.1 # Determine the duration of the noice filtering. Ad
 SHOW_FULL_RESPONSE = True  # Determine the API response of the recognition software. TRUE = full response, FALSE = only most likely answer
 
 
-def record_audio(file_path):
+def record_audio_file(file_path): # Not longer needed
     """
     Records audio from the specified file path using SpeechRecognition.
 
@@ -25,8 +25,7 @@ def record_audio(file_path):
 
     return audio_data
 
-
-def recognize_audio(audio_data):
+def recognize_audio():
     """
     Recognizes speech from the given audio data using Google's speech recognition.
 
@@ -36,16 +35,28 @@ def recognize_audio(audio_data):
     Returns:
     - str: Recognized text.
     """
-    recognizer = sr.Recognizer()
+    r = sr.Recognizer()
 
+    with sr.Microphone() as source:
+        #//TODO Add some ambient noise adjustment
+        # Actual 
+        print("Say something:")
+        audio = r.listen(source)
+
+    said = ""
     try:
-        recognized_text = recognizer.recognize_google(audio_data, show_all=SHOW_FULL_RESPONSE)
+        print("Attempting to recognize...")
+        said = r.recognize_google(audio, show_all=SHOW_FULL_RESPONSE)
+        print("You said: ", said)
     except sr.UnknownValueError:
-        return "Google Speech Recognition could not understand audio"
+        print("Google Speech Recognition could not understand audio")
     except sr.RequestError as e:
-        return f"Could not request results from Google Speech Recognition service; {e}"
+        print(f"Could not request results from Google Speech Recognition service; {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
 
-    return recognized_text
+    return said
+
 
 def call_speech_to_text():
     main()
@@ -57,32 +68,60 @@ def main():
     Returns:
         str: Recognized text.
     """
-    # Record audio from the specified file
-    audio_data = record_audio(FILE_PATH)
-
-    # Recognize and return the speech from the audio data
-    recognized_text = recognize_audio(audio_data)
-    return recognized_text
-
-
-def test():
-    """
-    Method for testing purposes only.
-
-    Input: audio file (.wav, .aiff, .aiffc, .flac, etc)
-
-    Output: transcribed voice to console via print method
-    """
-    # Execute the main function
-    recognized_text = main()
+    # Record audio from the microphone
+    audio_data = recognize_audio()
 
     # Print the type of the result
-    print(f"Type of result: {type(recognized_text)}")
+    print(f"Type of result: {type(audio_data)}")
 
     # Print the recognized text
-    print(recognized_text)
+    print(audio_data)
+    return audio_data
+
+def test(file_path=None, use_microphone=False):
+    """
+    Recognizes speech from the given audio data using Google's speech recognition.
+
+    Parameters:
+    - file_path (str): Path to the audio file. If provided, it will recognize audio from the file.
+    - use_microphone (bool): If True, it will use the microphone to capture audio.
+
+    Returns:
+    - str: Recognized text.
+    """
+    if file_path:
+        try:
+            # Record audio from the specified file
+            audio_data = record_audio_file(file_path)
+
+            # Recognize and return the speech from the audio data
+            recognized_text = recognize_audio(audio_data)
+
+            # Print the type of the result
+            print(f"Type of result: {type(recognized_text)}")
+
+            # Print the recognized text
+            print(recognized_text)
+        except Exception as e:
+            print("Error: {e}")
+    elif use_microphone:
+        try:
+            print("Microphone Testcase:\n")
+            
+            # Record audio from the microphone
+            audio_data = recognize_audio()
+
+            # Print the type of the result
+            print(f"Type of result: {type(audio_data)}")
+
+            # Print the recognized text
+            print(audio_data)
+        except Exception as e:
+            print("Error: {e}")
+    else:
+        raise ValueError("Either 'file_path' or 'use_microphone' must be provided.")
 
 
 if __name__ == "__main__":
     print("Test case")
-    test()
+    main()
