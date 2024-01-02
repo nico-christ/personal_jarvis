@@ -1,7 +1,6 @@
 from text_to_speech import call_text_to_speech as speak
 from speech_to_text import call_speech_to_text as record
 from basic_functions import *
-from datetime import datetime
 import logging
 
 def greet_user():
@@ -10,14 +9,6 @@ def greet_user():
         speak("Hello, how are you my guy?")
     except Exception as e:
         logging.error(f"An error occurred while greeting user: {e}")
-
-def get_current_time():
-    """Get and speak the current time."""
-    try:
-        current_time = datetime.now().strftime("%H:%M")
-        speak(f"The current time is {current_time}")
-    except Exception as e:
-        logging.error(f"An error occurred while getting current time: {e}")
 
 def apologize():
     """Apologize for not understanding the command."""
@@ -34,7 +25,7 @@ def help(audio_data):
     - audio_data (str): The audio data containing user commands.
     """
     # List of supported commands
-    commands = ["hello", "help", "time"]
+    commands = ["date", "hello", "help", "time", "weather"]
     
     # Find all commands present in the audio data
     found_commands = [cmd for cmd in commands if cmd in audio_data]
@@ -48,6 +39,10 @@ def help(audio_data):
                 speak("The hello command is used for greeting you")
             elif found_command == "time":
                 speak("The time command tells you the current time")
+            elif found_command == "date":
+                speak("The time command tells you the current date")
+            elif found_command == "weather":
+                speak("The time command tells you the weather right at the moment")
             elif found_command == "help":
                 speak("The help command helps you to understand what the other commands do")
         except Exception as e:
@@ -62,6 +57,40 @@ def help(audio_data):
             # Handle any errors that may occur during apology
             logging.error(f"An error occurred while explaining commands: {e}")
 
+def get_weather_data():
+    """
+    Get weather data for a predefined city and speak the weather information.
+
+    The function fetches weather data for the specified city (Cologne in this case)
+    using the OpenWeatherMap API and speaks the current weather conditions.
+
+    Note: Replace the city with the desired location and make sure to have a valid
+    OpenWeatherMap API key configured in the get_weather function.
+
+    Raises:
+    - Exception: Any general exception that occurs during the process.
+
+    Example:
+    get_weather_data()
+    """
+    city = "Cologne"  # Replace with the desired city
+    try:
+        if city:
+            weather_data = get_weather(city=city)
+            if weather_data:
+                temperature = weather_data.get('main', {}).get('temp')
+                description = weather_data.get('weather', [{}])[0].get('description')
+                if temperature is not None and description:
+                    speak(f"The weather in {city} is {description} with a temperature of {temperature} degrees Celsius.")
+                else:
+                    speak("Sorry, the weather information is incomplete.")
+            else:
+                speak("Sorry, I couldn't fetch the weather information.")
+        else:
+                speak("Please specify a city for the weather information.")
+    except Exception as e:
+        print(f"Error while fetching weather data: {e}")
+
 def process_audio_data(audio_data):
     """
     Process the audio data and execute the corresponding command.
@@ -74,7 +103,17 @@ def process_audio_data(audio_data):
     elif "hello" in audio_data:
         greet_user()
     elif "time" in audio_data:
-        get_current_time()
+        try:
+            speak(f"The current time is {get_current_time()}")
+        except Exception as e:
+            logging.error(f"An error occurred while getting current time: {e}")
+    elif "date" in audio_data:
+        try:
+            speak(f"The current date is {get_current_date()}")
+        except Exception as e:
+            logging.error(f"An error occurred while getting current date: {e}")
+    elif "weather" in audio_data:
+        get_weather_data()
     else:
         apologize()
 
