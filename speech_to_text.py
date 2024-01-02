@@ -3,7 +3,7 @@ import speech_recognition as sr
 # Constants
 FILE_PATH = 'files/harvard.wav'  # Path to the audio file
 AMBIENT_NOISE_DURATION = 0.1 # Determine the duration of the noice filtering. Adjust for diffrent quality.
-SHOW_FULL_RESPONSE = True  # Determine the API response of the recognition software. TRUE = full response, FALSE = only most likely answer
+SHOW_FULL_RESPONSE = False  # Determine the API response of the recognition software. TRUE = full response, FALSE = only most likely answer
 
 
 def record_audio_file(file_path): # Not longer needed
@@ -59,7 +59,7 @@ def recognize_audio():
 
 
 def call_speech_to_text():
-    main()
+    return main()
 
 def main():
     """
@@ -73,9 +73,13 @@ def main():
 
     # Print the type of the result
     print(f"Type of result: {type(audio_data)}")
-
-    # Print the recognized text
-    print(audio_data)
+    
+    # Print the recognized text or a message if it's empty
+    if audio_data:
+        print("Recognized text:", audio_data)
+    else:
+        print("No text was recognized.")
+    
     return audio_data
 
 def test(file_path=None, use_microphone=False):
