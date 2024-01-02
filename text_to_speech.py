@@ -75,6 +75,7 @@ languages = {
 FILE_PATH = 'out/output.mp3'
 LANGUAGE = "en-US" #languages["English"]
 TEST_TEXT = 'Hello, this is a text-to-speech example.'
+SLEEP_TIME = 5
 
 
 def text_to_speech(text, language=LANGUAGE, file_path=FILE_PATH):
@@ -125,8 +126,8 @@ def call_text_to_speech(text=TEST_TEXT, language=LANGUAGE):
     """
     text_to_speech(text, language, file_path=FILE_PATH)
     
-    # Sleep 10s to prevent early deletion
-    time.sleep(10)
+    # Sleep to prevent early deletion
+    time.sleep(SLEEP_TIME)
     
     # Delete the temporary mp3 file
     del_file()
