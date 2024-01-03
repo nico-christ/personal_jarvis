@@ -60,6 +60,12 @@ def recognize_audio():
 
 
 def call_speech_to_text():
+    """
+    Call the main function for speech-to-text conversion.
+
+    Returns:
+    - The result of the speech-to-text conversion.
+    """
     return main()
 
 def main():

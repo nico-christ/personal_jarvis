@@ -89,7 +89,21 @@ def get_weather_data():
         else:
                 speak("Please specify a city for the weather information.")
     except Exception as e:
-        print(f"Error while fetching weather data: {e}")
+        logging.error(f"Error while fetching weather data: {e}")
+
+def get_web_result(query):
+    try:
+        web_data = search_web(query)
+        if web_data:
+            try:
+                #speak(f"I found the following on the web: {web_data}")
+                speak(web_data)
+            except Exception as e:
+                logging.error(f"An error occurred while tring to provide the web data: {e}")
+        else:
+            speak(f"Sorry i couldn´t find anything regarding: {query}")
+    except Exception as e:
+        logging.error(f"An error occurred while atempting searching the web: {e}")
 
 def process_audio_data(audio_data):
     """
@@ -114,6 +128,12 @@ def process_audio_data(audio_data):
             logging.error(f"An error occurred while getting current date: {e}")
     elif "weather" in audio_data:
         get_weather_data()
+    elif ("search" in audio_data and "web" in audio_data):
+        try:
+            query_unfiltered = get_string_after_keywords(audio_data,'search', 'web')
+            get_web_result(query_unfiltered)
+        except Exception as e:
+            logging.error(f"An error occurred while searching the web: {e}")
     else:
         apologize()
 
