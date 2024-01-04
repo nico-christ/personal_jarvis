@@ -1,6 +1,6 @@
 import main
 
-TEST_KEYWORD = "joke"
+TEST_KEYWORD = "help hello"
 
 def testing():
     main.process_audio_data(TEST_KEYWORD)

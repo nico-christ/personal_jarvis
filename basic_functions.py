@@ -183,9 +183,9 @@ def search_web(input):
         - dict: The constructed payload.
         """
         payload = {
-            'key': GOOGLE_API_KEY,
+            'key': GOOGLE_API_KEY, # Uncomment at top
             'q': query,
-            'cx': CUSTOM_SEARCH_ENGINE_ID
+            'cx': CUSTOM_SEARCH_ENGINE_ID # Uncomment at top
             #'start': start,
             #'num': num,
             #'dateRestrict': date_restrict

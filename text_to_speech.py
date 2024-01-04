@@ -75,10 +75,13 @@ languages = {
 FILE_PATH = 'out/output.mp3'
 LANGUAGE = "en-US" #languages["English"]
 TEST_TEXT = 'Hello, this is a text-to-speech example.'
-SLEEP_TIME = 5
+SLEEP_TIME = 10
 
+def custom_voice():
+    # Create function for custom voice
+    pass
 
-def text_to_speech(text, language=LANGUAGE, file_path=FILE_PATH):
+def text_to_speech(text, language=LANGUAGE, file_path=FILE_PATH, voice=None):
     """
     Convert text to speech and play the generated speech.
 
@@ -87,22 +90,30 @@ def text_to_speech(text, language=LANGUAGE, file_path=FILE_PATH):
     - language (str): The language code for text-to-speech (default is 'en').
     - file_path (str): The file path to save the generated speech (default is 'out/output.mp3').
     """
-    try:
-        # Create a gTTS object
-        tts = gTTS(text=text, lang=language, slow=False)
-
-        # Save the generated speech to a file
+    
+    if voice:
         try:
-            tts.save(file_path)
+            custom_voice()
         except Exception as e:
-            logging.error(f"Error: File couldn't be created - {e}")
+            logging.error(f"Error with custom voice: {e}")
+    else:
+    
+        try:
+            # Create a gTTS object
+            tts = gTTS(text=text, lang=language, slow=False)
 
-        # Play the generated speech using subprocess
-        subprocess.run(['start', file_path], shell=True)
-        logging.info("Speech successfully generated and played.")
+            # Save the generated speech to a file
+            try:
+                tts.save(file_path)
+            except Exception as e:
+                logging.error(f"Error: File couldn't be created - {e}")
 
-    except Exception as e:
-        logging.error(f"Error: {e}")
+            # Play the generated speech using subprocess
+            subprocess.run(['start', file_path], shell=True)
+            logging.info("Speech successfully generated and played.")
+
+        except Exception as e:
+            logging.error(f"Error: {e}")
 
 def del_file(file_path=FILE_PATH):
     """

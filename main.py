@@ -112,32 +112,41 @@ def process_audio_data(audio_data):
     Parameters:
     - audio_data (str): The audio data containing user commands.
     """
+    keyword_actions = {
+        "hello": greet_user,
+        "time": get_current_time,
+        "date": get_current_date,
+        "weather": get_weather_data,
+        "joke": tell_joke,
+    }
+    
     if "help" in audio_data:
         help(audio_data)
-    elif "hello" in audio_data:
-        greet_user()
-    elif "time" in audio_data:
+        return
+
+    if "search" in audio_data.lower() and "web" in audio_data.lower():
         try:
-            speak(f"The current time is {get_current_time()}")
-        except Exception as e:
-            logging.error(f"An error occurred while getting current time: {e}")
-    elif "date" in audio_data:
-        try:
-            speak(f"The current date is {get_current_date()}")
-        except Exception as e:
-            logging.error(f"An error occurred while getting current date: {e}")
-    elif "weather" in audio_data:
-        get_weather_data()
-    elif ("search" in audio_data and "web" in audio_data):
-        try:
-            query_unfiltered = get_string_after_keywords(audio_data,'search', 'web')
-            get_web_result(query_unfiltered)
+            search_web_query = get_string_after_keywords(audio_data, 'search', 'web')
+            get_web_result(search_web_query)
         except Exception as e:
             logging.error(f"An error occurred while searching the web: {e}")
-    elif "joke" in audio_data:
-        speak(tell_joke())
-    else:
-        apologize()
+            apologize()
+        return
+
+    for keyword, action in keyword_actions.items():
+        if keyword in audio_data.lower():
+            try:
+                if callable(action):
+                    result = action()
+                    if result:
+                        speak(result)
+                else:
+                    action(audio_data)
+                return
+            except Exception as e:
+                logging.error(f"An error occurred: {e}")
+
+    apologize()
 
 def main():
     """Main function to execute the voice command processing."""
