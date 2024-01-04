@@ -134,6 +134,8 @@ def process_audio_data(audio_data):
             get_web_result(query_unfiltered)
         except Exception as e:
             logging.error(f"An error occurred while searching the web: {e}")
+    elif "joke" in audio_data:
+        speak(tell_joke())
     else:
         apologize()
 

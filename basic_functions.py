@@ -2,13 +2,15 @@ import requests
 import logging
 import configparser
 import re
+import json
+import random
 
 config = configparser.ConfigParser()
 config.read('config.ini')
 
 #Constants
-GOOGLE_API_KEY = config['API_KEYS']['GOOGLE_API_KEY']
-CUSTOM_SEARCH_ENGINE_ID = config['API_KEYS']['CUSTOM_SEARCH_ENGINE_ID']
+#GOOGLE_API_KEY = config['API_KEYS']['GOOGLE_API_KEY']
+#CUSTOM_SEARCH_ENGINE_ID = config['API_KEYS']['CUSTOM_SEARCH_ENGINE_ID']
 REG_FILTER = r'<b>|<\/b>|&nbsp;|;|\.\.\.'
 COMMON_FILLER_WORDS = [ # Array of common filler words (these get ignored in some features)
     '<b>', '</b>','a', 'about', 'above', 'across', 'after', 'against', 'all', 'almost', 'along', 'also', 'although',
@@ -105,7 +107,7 @@ def get_string_after_keywords(input, *keywords):
 
     Returns:
     - str: The substring that follows the first occurrence of any of the keywords.
-           Returns an empty string if none of the keywords are found.
+        Returns an empty string if none of the keywords are found.
 
     Example:
     >>> input_str = "This is a sample input string with keywords"
@@ -300,10 +302,13 @@ def get_random_response(responses):
     import random
     return random.choice(responses)
 
-def tell_joke(joke_list):
-    # Implement a function to tell funny jokes
-    pass
+def tell_joke(joke_list = "files/jokes.json"):
+    input_file = open (joke_list)
+    jokes = json.load(input_file)
+    
+    random_joke = random.choice(jokes)
+    return random_joke
 
 if __name__ == "__main__":
-    result = search_web("python")
+    result = tell_joke()
     print(result)
