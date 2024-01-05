@@ -1,5 +1,6 @@
 import spacy
-# Import the matcher
+import functools
+from decorators import *
 from spacy.matcher import Matcher
 from spacy.tokens import Doc, Span, Token
 
@@ -288,6 +289,7 @@ def return_finished_string(doc: Doc):
     # Add returning function and further logic
     pass
 
+@timer
 def main():
     words = ["Hello", "World", "!"]
     spaces = [True, False, False]
