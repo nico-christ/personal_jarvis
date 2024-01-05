@@ -9,8 +9,8 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 #Constants
-#GOOGLE_API_KEY = config['API_KEYS']['GOOGLE_API_KEY']
-#CUSTOM_SEARCH_ENGINE_ID = config['API_KEYS']['CUSTOM_SEARCH_ENGINE_ID']
+GOOGLE_API_KEY = config['API_KEYS']['GOOGLE_API_KEY']
+CUSTOM_SEARCH_ENGINE_ID = config['API_KEYS']['CUSTOM_SEARCH_ENGINE_ID']
 REG_FILTER = r'<b>|<\/b>|&nbsp;|;|\.\.\.'
 COMMON_FILLER_WORDS = [ # Array of common filler words (these get ignored in some features)
     '<b>', '</b>','a', 'about', 'above', 'across', 'after', 'against', 'all', 'almost', 'along', 'also', 'although',
