@@ -1,7 +1,8 @@
 import spacy
 import functools
 from decorators import *
-from spacy.matcher import Matcher
+from custom_spacy_components import *
+from spacy.matcher import Matcher, PhraseMatcher
 from spacy.tokens import Doc, Span, Token
 
 
@@ -171,6 +172,33 @@ def create_matcher(nlp: spacy.Language.component) -> Matcher:
     matcher = Matcher(nlp.vocab)
     return matcher
 
+def create_phrasematcher(nlp: spacy.Language.component) -> PhraseMatcher:
+    """
+    Create and return a spaCy PhraseMatcher object.
+
+    This function initializes a spaCy PhraseMatcher object with the vocabulary of the provided spaCy language model.
+    
+    The PhraseMatcher works like regular expression or keyword search - but access to the tokens!
+    
+    It takes Doc objects as pattern and is more efficient and faster than the regular Matcher.
+    Great for matching large word lists in context.
+
+    Args:
+        nlp (spacy.Language.component): A spaCy language model.
+
+    Returns:
+        PhraseMatcher: A spaCy PhraseMatcher object initialized with the vocabulary of the provided language model.
+
+    Example:
+        >>> import spacy
+        >>> from your_module import create_phrasematcher
+        >>> nlp = spacy.load("en_core_web_sm")
+        >>> matcher = create_phrasematcher(nlp)
+        >>> # Use the matcher to define and apply text patterns
+    """
+    matcher = PhraseMatcher(nlp.vocab)
+    return matcher
+
 
 # ---------------------- get() functions ----------------------------
 def get_doc() -> Doc:
@@ -183,8 +211,39 @@ def get_keyword(doc: Doc) -> list:
     # Add logic for keyword processing
     pass
 
-def get_span() -> Span:
-    pass
+def get_span(doc: Doc, matcher: Matcher | PhraseMatcher) -> Span | None:
+    span = [doc[start:end] for match_id, start, end in matcher(doc)]
+    return span #TODO -> Maybe remove this func, cause its a duplicate of get_span_list()
+
+def get_span_list(doc: Doc, match_ID: list) -> list[Span]:
+    """
+    Get a list of matching spans using match IDs.
+
+    This function takes a spaCy Doc object and match IDs, and returns a list of 
+    text spans corresponding to the matches.
+
+    Args:
+        doc (spacy.tokens.Doc): A spaCy Doc object representing a processed text.
+        match_ID (list): List of match IDs.
+
+    Returns:
+        list: List of spaCy spans corresponding to the matches.
+
+    Example:
+        >>> import spacy
+        >>> from spacy.matcher import Matcher
+        >>> from your_module import get_match_id, get_match_text
+        >>> nlp = spacy.load("en_core_web_sm")
+        >>> matcher = Matcher(nlp.vocab)
+        >>> doc = nlp("Apple Inc. is a technology company.")
+        >>> pattern = [{"ENT_TYPE": "ORG"}]
+        >>> match_ids = get_match_id(doc, matcher, pattern)
+        >>> match_text = get_match_text(doc, match_ids)
+        >>> print(match_text)
+        [Apple Inc.]
+    """
+    match_span_list = [doc[start:end] for match_id, start, end in match_ID]
+    return match_span_list
 
 def get_token(doc: Doc, index: int = None) -> list | Token:
     """
@@ -342,36 +401,6 @@ def get_match_id(doc: Doc, matcher: Matcher, pattern: list) -> any:
     match_ID = matcher(doc)
     return match_ID
 
-def get_match_text(doc: Doc, match_ID: list) -> list:
-    """
-    Get match text spans using match IDs.
-
-    This function takes a spaCy Doc object and match IDs, and returns a list of 
-    text spans corresponding to the matches.
-
-    Args:
-        doc (spacy.tokens.Doc): A spaCy Doc object representing a processed text.
-        match_ID (list): List of match IDs.
-
-    Returns:
-        list: List of spaCy spans corresponding to the matches.
-
-    Example:
-        >>> import spacy
-        >>> from spacy.matcher import Matcher
-        >>> from your_module import get_match_id, get_match_text
-        >>> nlp = spacy.load("en_core_web_sm")
-        >>> matcher = Matcher(nlp.vocab)
-        >>> doc = nlp("Apple Inc. is a technology company.")
-        >>> pattern = [{"ENT_TYPE": "ORG"}]
-        >>> match_ids = get_match_id(doc, matcher, pattern)
-        >>> match_text = get_match_text(doc, match_ids)
-        >>> print(match_text)
-        [Apple Inc.]
-    """
-    match_span = [doc[start:end] for match_id, start, end in match_ID]
-    return match_span
-
 def get_vocab_hash(nlp: spacy.Language.component, string: str) -> int:
     string_hash = nlp.vocab.strings[string]
     return string_hash
@@ -415,8 +444,10 @@ def get_similarity(root_object: spacy.tokens.Doc | spacy.tokens.Span | spacy.tok
 
     return [root_object.similarity(obj) for obj in objects_to_compare]
     
-# ---------------------------- find() functions -----------------------------
-
+# ---------------------------- add() functions -----------------------------
+def add_component(nlp: spacy.Language.component):
+    #TODO
+    pass
 
 # ------------------------- predict() functions -------------------------
 def predict_part_of_speech(doc: Doc) -> dict:
@@ -528,18 +559,16 @@ def return_finished_string(doc: Doc) -> str:
     # Add returning function and further logic
     pass
 
-@timer
+#@timer
 def main():
         
     nlp = create_nlp()
-    doc = create_doc(nlp, "I like pizza and pasta")
-    token = nlp("soap")[0]
-    print(doc, token)
-    #matcher = create_matcher(nlp)
+    nlp.add_pipe("doc_length", name="length", first=True)
+    doc = create_doc(nlp, "Hello World!")
     
-    #id = get_match_id(doc, matcher, patterns_config["root"])
-    test = get_similarity(doc, token)
-    print(test)
+    
+    #test = get_similarity(doc, token)
+    #print(test)
     #print(type(test))
 
 # for testing
