@@ -6,13 +6,15 @@ from spacy.tokens import Doc, Span, Token
 
 
 # Constants
-LANGUAGE = "en_core_web_sm"
+LANGUAGE_MODEL = "en_core_web_md"
 
-patterns_config = [
-    {"name": "adjective_noun", "rules": [{"POS": "ADJ"}, {"POS": "NOUN"}]},
-    {"name": "verb_noun", "rules": [{"POS": "VERB"}, {"POS": "NOUN"}]},
+patterns_config = {
+    "verb_noun": [[{"POS": "VERB"}, {"POS": "DET", "OP": "?"}, {"POS": "NOUN"}], [{"POS": "NOUN"}, {"POS": "DET", "OP": "?"}, {"POS": "VERB"}]],
+    "adjective_noun": [[{"POS": "ADJ"}, {"POS": "NOUN"}], [{"POS": "ADJ"}, {"POS": "NOUN"}]],
+    "root": [[{'DEP': 'ROOT'}, {"POS": "DET", "OP": "?"}, {"POS": "NOUN"}], [{'POS': 'NOUN'}, {"POS": "DET", "OP": "?"}, {"DEP": "ROOT"}]],
+    "iPhone_test": [{"TEXT": "iPhone"}, {"TEXT":"X"}]
     # Add more patterns as needed
-]
+}
 
 
 def process_with_nlp(input: str):
@@ -28,7 +30,7 @@ def process_with_nlp(input: str):
 
 
 # ----------------------------- create() functions --------------------------
-def create_nlp(language=LANGUAGE):
+def create_nlp(language=LANGUAGE_MODEL):
     """
     Create a new spaCy NLP (Natural Language Processing) object for text processing.
 
@@ -129,11 +131,16 @@ def create_span(doc: Doc, start_index: int = 0, end_index: int = None, label: st
         >>> print(custom_doc.text)
         Hello world!
     """
-    if label:
-        span = Span(doc, start_index, end_index)
-    else:
-        span = Span(doc, start_index, end_index, label=label)
-    return span
+    try:
+        if label:
+            span = Span(doc, start_index, end_index)
+        else:
+            span = Span(doc, start_index, end_index, label=label)
+        return span
+    except ValueError (f"Invalid Index. start_index: {start_index}; end_index: {end_index}"):
+        return
+    except Exception as e:
+        print("Error: Something went wrong. - {e}")
 
 def create_token() -> Token:
     pass
@@ -141,7 +148,7 @@ def create_token() -> Token:
 def create_pattern():
     pass
 
-def create_matcher(nlp: spacy.Language.component):
+def create_matcher(nlp: spacy.Language.component) -> Matcher:
     """
     Create and return a spaCy Matcher object.
 
@@ -210,7 +217,7 @@ def get_token(doc: Doc, index: int = None) -> list | Token:
     if index is not None:
         try:
             return doc[index]
-        except IndexError:
+        except IndexError (f"Invalid Index for the doc: {doc}"):
             return None  # Handle index out of range gracefully
     else:
         return [token for token in doc]
@@ -304,7 +311,7 @@ def get_entity(doc: Doc) -> dict:
     
     return dict(zip(text, label))
 
-def get_match_id(doc: Doc, matcher, pattern) -> any:
+def get_match_id(doc: Doc, matcher: Matcher, pattern: list) -> any:
     """
     Get match IDs using a spaCy Matcher with a specified pattern.
 
@@ -331,11 +338,11 @@ def get_match_id(doc: Doc, matcher, pattern) -> any:
         >>> print(match_ids)
         [(384, 385)]
     """
-    matcher.add("test", [pattern])
+    matcher.add("test", pattern)
     match_ID = matcher(doc)
     return match_ID
 
-def get_match_text(doc: Doc, match_ID) -> list:
+def get_match_text(doc: Doc, match_ID: list) -> list:
     """
     Get match text spans using match IDs.
 
@@ -364,8 +371,50 @@ def get_match_text(doc: Doc, match_ID) -> list:
     """
     match_span = [doc[start:end] for match_id, start, end in match_ID]
     return match_span
-        
 
+def get_vocab_hash(nlp: spacy.Language.component, string: str) -> int:
+    string_hash = nlp.vocab.strings[string]
+    return string_hash
+
+def get_vocab_string(nlp: spacy.Language.component, string_hash) -> str:
+    string_text = nlp.vocab.strings[string_hash]
+    return string_text
+
+def get_lexeme(nlp: spacy.Language.component, string: str) -> spacy.lexeme.Lexeme:
+    """
+    Retrieve the lexeme for a given string in the specified spaCy language model.
+
+    Args:
+        nlp (spacy.Language.component): The spaCy language model.
+        string (str): The word for which to retrieve the lexeme.
+
+    Returns:
+        spacy.lexeme.Lexeme: Contains the context-independent information about a word.
+    """
+    lexeme = nlp.vocab[string]
+    return lexeme
+
+#FIXME -> Does not work with different types (Example: Doc and Tokens). However, does work with the same types (Example: Token and Token).
+# Just use it if same types get compares otherwise do it manuelly.
+def get_similarity(root_object: spacy.tokens.Doc | spacy.tokens.Span | spacy.tokens.Token,
+                   *objects_to_compare: spacy.tokens.Doc | spacy.tokens.Span | spacy.tokens.Token) -> list[float]:
+    """
+    Calculate similarity scores between a root object and a list of objects to compare.
+
+    Args:
+        root_object (spacy.tokens.Doc | spacy.tokens.Span | spacy.tokens.Token):
+            The root object for comparison.
+        *objects_to_compare (spacy.tokens.Doc | spacy.tokens.Span | spacy.tokens.Token):
+            Any number of objects to compare with the root object.
+
+    Returns:
+        list[float]: A list of similarity scores.
+    """
+    if not objects_to_compare:
+        raise ValueError(f"No objects to compare for {root_object}")
+
+    return [root_object.similarity(obj) for obj in objects_to_compare]
+    
 # ---------------------------- find() functions -----------------------------
 
 
@@ -396,7 +445,7 @@ def predict_part_of_speech(doc: Doc) -> dict:
     predictions = [token.pos_ for token in doc]
     
     if len(text) != len(predictions):
-        raise IndexError(f"a and b does not have the same length. Doc: {doc}")
+        raise IndexError(f"Text and predictions does not have the same length in doc: {doc}")
     
     return dict(zip(text, predictions))
 
@@ -483,13 +532,15 @@ def return_finished_string(doc: Doc) -> str:
 def main():
         
     nlp = create_nlp()
-    doc = create_doc(nlp, "Upcomming iPhone X release date leaked")
-    matcher = create_matcher(nlp)
-    pattern = [{"TEXT": "iPhone"}, {"TEXT":"X"}]
+    doc = create_doc(nlp, "I like pizza and pasta")
+    token = nlp("soap")[0]
+    print(doc, token)
+    #matcher = create_matcher(nlp)
     
-    id = get_match_id(doc, matcher, pattern)
-    test = get_match_text(doc, id)
+    #id = get_match_id(doc, matcher, patterns_config["root"])
+    test = get_similarity(doc, token)
     print(test)
+    #print(type(test))
 
 # for testing
 if __name__ == "__main__":

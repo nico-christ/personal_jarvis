@@ -86,7 +86,7 @@ This project utilizes the SpeechRecognition library in Python for speech recogni
         Replace `<language_model>` with the specific model you want to download. For example, we use the english model:
 
         ```bash
-        python -m spacy download en_core_web_sm
+        python -m spacy download en_core_web_md
         ```
 
     ## Additional Resources
